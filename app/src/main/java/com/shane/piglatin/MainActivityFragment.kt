@@ -32,6 +32,8 @@ class MainActivityFragment : Fragment() {
             copy_button.setOnClickListener({ copyTranslationToClipBoard(activity as Context) })
             share_button.setOnClickListener({ shareTranslation(activity as Context) })
         }
+
+
     }
 
     private fun shareTranslation(context: Context) {
@@ -40,7 +42,14 @@ class MainActivityFragment : Fragment() {
         sendIntent.action = Intent.ACTION_SEND
         sendIntent.putExtra(Intent.EXTRA_TEXT, text)
         sendIntent.type = "text/plain"
-        startActivity(sendIntent)
+
+        val packageManager = context.packageManager
+
+        sendIntent.resolveActivity(packageManager)?.let {
+            startActivity(Intent.createChooser(sendIntent, "Send to"))
+        } ?: run {
+            Toast.makeText(context, "Failed to share text with other apps.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun copyTranslationToClipBoard(context: Context) {
