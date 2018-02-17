@@ -1,5 +1,8 @@
 package com.shane.piglatin
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -8,7 +11,10 @@ import android.support.v4.app.FragmentActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_main.*
+
+
 
 
 class MainActivityFragment : Fragment() {
@@ -21,8 +27,20 @@ class MainActivityFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         english_edit_text.afterTextChanged { handleTextChanged(it) }
+        if (activity != null) {
+            handleTextFromIntent(activity)
+            copy_button.setOnClickListener({ copyTranslationToClipBoard() })
+        }
+    }
 
-        if (activity != null) handleTextFromIntent(activity)
+    private fun copyTranslationToClipBoard() {
+        val text = translated_text.text
+        activity.let {
+            val clipboard = activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Pig Latin Translation", text)
+            clipboard.primaryClip = clip
+            Toast.makeText(activity, "Text copied to clipboard", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun handleTextChanged(text: String) {
