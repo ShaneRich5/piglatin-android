@@ -6,16 +6,37 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.util.*
 
 
-class MainActivityFragment : Fragment() {
+class MainActivityFragment : Fragment(), TextToSpeech.OnInitListener {
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+
+            val result = textToSpeech.setLanguage(Locale.US)
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported")
+            } else {
+                raw_text_header.isEnabled = true
+                translated_text_header.isEnabled = true
+            }
+
+        } else {
+            Log.e("TTS", "Initilization Failed!")
+        }
+    }
+
+    lateinit var textToSpeech: TextToSpeech
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -24,6 +45,8 @@ class MainActivityFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        textToSpeech = TextToSpeech(activity, this)
+
         english_edit_text.afterTextChanged { handleTextChanged(it) }
         if (activity != null) {
             handleTextFromIntent(activity)
@@ -32,8 +55,26 @@ class MainActivityFragment : Fragment() {
         }
 
         clear_button.setOnClickListener({ english_edit_text.setText("") })
-        english_edit_text.setOnClickListener({ Toast.makeText(context, "Speak english", Toast.LENGTH_SHORT).show() })
-        translated_text_header.setOnClickListener({ Toast.makeText(context, "Speak pig latin", Toast.LENGTH_SHORT).show() })
+        raw_text_header.setOnClickListener({
+            val text = english_edit_text.text.toString()
+            if ( ! text.isEmpty()) playAudioForText(text)
+        })
+        translated_text_header.setOnClickListener({
+            val text = translated_text.text.toString()
+            playAudioForText(text)
+        })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        textToSpeech.let {
+            it.stop()
+            it.shutdown()
+        }
+    }
+
+    private fun playAudioForText(text: String) {
+        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     private fun shareTranslation(context: Context) {
