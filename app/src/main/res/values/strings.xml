@@ -1,4 +1,11 @@
 <resources>
-    <string name="app_name">PigLatin</string>
+    <string name="app_name">Pig Latin</string>
     <string name="action_settings">Settings</string>
+    <string name="input_translation_prompt">Tap to enter text</string>
+    <string name="header_english_text">English</string>
+    <string name="description_clear_button">Clears text to be translated</string>
+    <string name="description_microphone_button">Receive input through microphone</string>
+    <string name="description_copy_button">Copies translated text to clipboard</string>
+    <string name="description_share_button">Shares text to other applications</string>
+    <string name="header_pig_latin_text">Pig Latin</string>
 </resources>

@@ -18,11 +18,19 @@ class MainActivityFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        english_edit_text.afterTextChanged { translateInput(it) }
+        english_edit_text.afterTextChanged { handleTextChanged(it) }
 
         if (activity != null) handleTextFromIntent(activity)
+    }
+
+    private fun handleTextChanged(text: String) {
+        translateInput(text)
+        text.isEmpty().let { textNotPresent ->
+            clear_button.visibility = if (textNotPresent) View.GONE else View.VISIBLE
+            card_translation_result.visibility = if (textNotPresent) View.GONE else View.VISIBLE
+        }
     }
 
     private fun handleTextFromIntent(activity: FragmentActivity?) {
