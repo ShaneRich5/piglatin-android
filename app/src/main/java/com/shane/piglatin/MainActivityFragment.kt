@@ -29,18 +29,26 @@ class MainActivityFragment : Fragment() {
         english_edit_text.afterTextChanged { handleTextChanged(it) }
         if (activity != null) {
             handleTextFromIntent(activity)
-            copy_button.setOnClickListener({ copyTranslationToClipBoard() })
+            copy_button.setOnClickListener({ copyTranslationToClipBoard(activity as Context) })
+            share_button.setOnClickListener({ shareTranslation(activity as Context) })
         }
     }
 
-    private fun copyTranslationToClipBoard() {
+    private fun shareTranslation(context: Context) {
         val text = translated_text.text
-        activity.let {
-            val clipboard = activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Pig Latin Translation", text)
-            clipboard.primaryClip = clip
-            Toast.makeText(activity, "Text copied to clipboard", Toast.LENGTH_SHORT).show()
-        }
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text)
+        sendIntent.type = "text/plain"
+        startActivity(sendIntent)
+    }
+
+    private fun copyTranslationToClipBoard(context: Context) {
+        val text = translated_text.text
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Pig Latin Translation", text)
+        clipboard.primaryClip = clip
+        Toast.makeText(activity, "Text copied to clipboard", Toast.LENGTH_SHORT).show()
     }
 
     private fun handleTextChanged(text: String) {
