@@ -11,11 +11,7 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_main.*
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 class MainActivityFragment : Fragment() {
-    val constanants = "bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -36,7 +32,6 @@ class MainActivityFragment : Fragment() {
             }
         }
     }
-
 
     private fun translateInput(text: String) {
         val translatedText = PigLatin.convertSentenceToPigLatin(text)
