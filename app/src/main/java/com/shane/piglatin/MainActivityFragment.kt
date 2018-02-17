@@ -15,8 +15,6 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_main.*
 
 
-
-
 class MainActivityFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +31,9 @@ class MainActivityFragment : Fragment() {
             share_button.setOnClickListener({ shareTranslation(activity as Context) })
         }
 
-
+        clear_button.setOnClickListener({ english_edit_text.setText("") })
+        english_edit_text.setOnClickListener({ Toast.makeText(context, "Speak english", Toast.LENGTH_SHORT).show() })
+        translated_text_header.setOnClickListener({ Toast.makeText(context, "Speak pig latin", Toast.LENGTH_SHORT).show() })
     }
 
     private fun shareTranslation(context: Context) {
@@ -46,7 +46,7 @@ class MainActivityFragment : Fragment() {
         val packageManager = context.packageManager
 
         sendIntent.resolveActivity(packageManager)?.let {
-            startActivity(Intent.createChooser(sendIntent, "Send to"))
+            startActivity(Intent.createChooser(sendIntent, "Send pig latin to"))
         } ?: run {
             Toast.makeText(context, "Failed to share text with other apps.", Toast.LENGTH_SHORT).show()
         }
