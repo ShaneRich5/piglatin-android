@@ -1,11 +1,13 @@
 package com.shane.piglatin
 
+import android.app.Activity.RESULT_OK
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -19,6 +21,10 @@ import java.util.*
 
 
 class MainActivityFragment : Fragment(), TextToSpeech.OnInitListener {
+    private val REQUEST_CODE_SPEECH_INPUT = 100
+
+    lateinit var textToSpeech: TextToSpeech
+
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
 
@@ -32,11 +38,9 @@ class MainActivityFragment : Fragment(), TextToSpeech.OnInitListener {
             }
 
         } else {
-            Log.e("TTS", "Initilization Failed!")
+            Log.e("TTS", "Initialization Failed!")
         }
     }
-
-    lateinit var textToSpeech: TextToSpeech
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -55,14 +59,48 @@ class MainActivityFragment : Fragment(), TextToSpeech.OnInitListener {
         }
 
         clear_button.setOnClickListener({ english_edit_text.setText("") })
+
         raw_text_header.setOnClickListener({
             val text = english_edit_text.text.toString()
             if ( ! text.isEmpty()) playAudioForText(text)
         })
+
         translated_text_header.setOnClickListener({
             val text = translated_text.text.toString()
             playAudioForText(text)
         })
+
+        microphone_button.setOnClickListener({
+            promptSpeechInput(activity as Context)
+        })
+    }
+
+    private fun promptSpeechInput(context: Context) {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt))
+
+        intent.resolveActivity(context.packageManager)?.let {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+        } ?: run {
+            Toast.makeText(context, getString(R.string.speech_not_supported), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            REQUEST_CODE_SPEECH_INPUT -> {
+                if (resultCode == RESULT_OK) {
+                    data?.let {
+                        val result = it.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                        english_edit_text.setText(result[0])
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -74,7 +112,7 @@ class MainActivityFragment : Fragment(), TextToSpeech.OnInitListener {
     }
 
     private fun playAudioForText(text: String) {
-        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null)
     }
 
     private fun shareTranslation(context: Context) {

@@ -8,4 +8,6 @@
     <string name="description_copy_button">Copies translated text to clipboard</string>
     <string name="description_share_button">Shares text to other applications</string>
     <string name="header_pig_latin_text">Pig Latin</string>
+    <string name="speech_prompt">Say something</string>
+    <string name="speech_not_supported">Speech translations are not supported.</string>
 </resources>
